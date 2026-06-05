@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createStockIn, updateStockIn, deleteStockIn, getStockInRecords } from '../api';
 
-const ITEMS = ['Steel bars', 'Wheelbarrows', 'Ceramic tiles'];
+const ITEMS = ['Steel bars', 'Wheelbarrows', 'Ceramic tiles',''];
 
 export default function StockIn() {
   const [form, setForm] = useState({

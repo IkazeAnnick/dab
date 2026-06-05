@@ -1,36 +1,21 @@
-const { getDb, saveDatabase } = require('./database');
+const { getPool } = require('./database');
 
-function run(sql, params = []) {
-  const db = getDb();
-  db.run(sql, params);
-  const lastInsertRowid = db.exec('SELECT last_insert_rowid() AS id')[0].values[0][0];
-  saveDatabase();
-  return { lastInsertRowid };
+async function run(sql, params = []) {
+  const pool = getPool();
+  const [result] = await pool.execute(sql, params);
+  return { lastInsertRowid: result.insertId };
 }
 
-function get(sql, params = []) {
-  const db = getDb();
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const result = stmt.getAsObject();
-    stmt.free();
-    return result;
-  }
-  stmt.free();
-  return undefined;
+async function get(sql, params = []) {
+  const pool = getPool();
+  const [rows] = await pool.execute(sql, params);
+  return rows[0];
 }
 
-function all(sql, params = []) {
-  const db = getDb();
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  const results = [];
-  while (stmt.step()) {
-    results.push(stmt.getAsObject());
-  }
-  stmt.free();
-  return results;
+async function all(sql, params = []) {
+  const pool = getPool();
+  const [rows] = await pool.execute(sql, params);
+  return rows;
 }
 
 module.exports = { run, get, all };
